@@ -23,23 +23,25 @@ export function AppShell() {
   };
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-10 border-b bg-card/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link to="/dashboard" className="flex items-center gap-2 font-semibold">
-            <Wallet className="h-5 w-5 text-primary" />
-            <span>Piso Tracker</span>
+      <header className="sticky top-0 z-10 bg-background/70 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+          <Link to="/dashboard" className="flex items-center gap-2 font-semibold tracking-tight">
+            <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-[var(--shadow-soft)]">
+              <Wallet className="h-4 w-4" />
+            </span>
+            <span className="text-lg">Piso Tracker</span>
           </Link>
-          <Button variant="ghost" size="sm" onClick={signOut}>
+          <Button variant="ghost" size="sm" onClick={signOut} className="rounded-full">
             <LogOut className="mr-2 h-4 w-4" /> Sign out
           </Button>
         </div>
-        <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-2 pb-2">
+        <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 pb-3">
           {navItems.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-              activeProps={{ className: "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm bg-primary/10 text-primary font-medium" }}
+              className="flex items-center gap-2 rounded-full px-4 py-2 text-sm text-muted-foreground transition hover:bg-white hover:text-foreground"
+              activeProps={{ className: "flex items-center gap-2 rounded-full px-4 py-2 text-sm bg-primary text-primary-foreground font-medium shadow-[var(--shadow-soft)]" }}
             >
               <item.icon className="h-4 w-4" />
               {item.label}

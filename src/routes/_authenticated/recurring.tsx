@@ -43,7 +43,15 @@ function RecurringPage() {
   const runFn = useServerFn(materializeDue);
 
   const createMut = useMutation({
-    mutationFn: (v: Parameters<typeof createRecurring>[0]["data"]) => createFn({ data: v }),
+    mutationFn: (v: {
+      kind: Kind;
+      amount: number;
+      category_id: string | null;
+      frequency: Freq;
+      start_on: string;
+      end_on: string | null;
+      note: string | null;
+    }) => createFn({ data: v }),
     onSuccess: () => {
       toast.success("Recurring rule added");
       qc.invalidateQueries({ queryKey: ["recurring"] });

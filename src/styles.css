@@ -62,33 +62,38 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(0.99 0.005 150);
-  --foreground: oklch(0.18 0.02 160);
+  /* Soft, rounded, Dribbble-budget aesthetic.
+   * Mint background, deep indigo-purple accents, candy pie palette. */
+  --radius: 1.25rem;
+  --background: oklch(0.965 0.025 165);
+  --foreground: oklch(0.22 0.06 275);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 160);
+  --card-foreground: oklch(0.22 0.06 275);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 160);
-  --primary: oklch(0.55 0.14 160);
-  --primary-foreground: oklch(0.99 0.005 150);
-  --secondary: oklch(0.96 0.01 160);
-  --secondary-foreground: oklch(0.22 0.03 160);
-  --muted: oklch(0.96 0.01 160);
-  --muted-foreground: oklch(0.5 0.02 160);
-  --accent: oklch(0.94 0.04 160);
-  --accent-foreground: oklch(0.22 0.03 160);
-  --destructive: oklch(0.58 0.22 25);
+  --popover-foreground: oklch(0.22 0.06 275);
+  --primary: oklch(0.55 0.22 285);
+  --primary-foreground: oklch(0.99 0.005 285);
+  --primary-soft: oklch(0.93 0.06 285);
+  --secondary: oklch(0.95 0.03 165);
+  --secondary-foreground: oklch(0.28 0.07 280);
+  --muted: oklch(0.95 0.02 175);
+  --muted-foreground: oklch(0.52 0.04 275);
+  --accent: oklch(0.93 0.06 285);
+  --accent-foreground: oklch(0.32 0.14 285);
+  --destructive: oklch(0.65 0.22 18);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.92 0.01 160);
-  --input: oklch(0.92 0.01 160);
-  --ring: oklch(0.55 0.14 160);
-  --income: oklch(0.6 0.16 155);
-  --expense: oklch(0.58 0.22 25);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --border: oklch(0.92 0.02 200);
+  --input: oklch(0.92 0.02 200);
+  --ring: oklch(0.55 0.22 285);
+  --income: oklch(0.68 0.16 175);
+  --expense: oklch(0.66 0.22 18);
+  --shadow-soft: 0 20px 45px -25px oklch(0.55 0.22 285 / 0.25);
+  /* Candy pie palette to match the reference */
+  --chart-1: oklch(0.72 0.14 175);   /* mint */
+  --chart-2: oklch(0.55 0.22 285);   /* purple */
+  --chart-3: oklch(0.72 0.18 350);   /* pink */
+  --chart-4: oklch(0.78 0.14 50);    /* peach */
+  --chart-5: oklch(0.65 0.22 25);    /* coral */
   --sidebar: oklch(0.984 0.003 247.858);
   --sidebar-foreground: oklch(0.129 0.042 264.695);
   --sidebar-primary: oklch(0.208 0.042 265.755);
@@ -142,5 +147,12 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+  }
+
+  /* Softer, more rounded shadcn cards to match the reference shot. */
+  [data-slot="card"] {
+    border-radius: calc(var(--radius) + 0.5rem);
+    border-color: transparent;
+    box-shadow: var(--shadow-soft);
   }
 }

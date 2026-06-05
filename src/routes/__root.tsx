@@ -79,11 +79,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "USAMONEEEYYY" },
+      { name: "description", content: "Budget Buddy is a PWA for tracking income and expenses with customizable categories and secure data vault." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "USAMONEEEYYY" },
+      { property: "og:description", content: "Budget Buddy is a PWA for tracking income and expenses with customizable categories and secure data vault." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -91,6 +91,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "Budget" },
+      { name: "twitter:title", content: "USAMONEEEYYY" },
+      { name: "twitter:description", content: "Budget Buddy is a PWA for tracking income and expenses with customizable categories and secure data vault." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/75844500-bfa0-4429-942a-22d9126ed68e/id-preview-15b652ec--b3cae6b3-16a9-42e1-876c-fc9eb2436091.lovable.app-1780664354799.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/75844500-bfa0-4429-942a-22d9126ed68e/id-preview-15b652ec--b3cae6b3-16a9-42e1-876c-fc9eb2436091.lovable.app-1780664354799.png" },
     ],
     links: [
       {

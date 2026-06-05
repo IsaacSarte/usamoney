@@ -14,7 +14,228 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      budgets: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          monthly_limit: number
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          id?: string
+          monthly_limit: number
+          user_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          monthly_limit?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budgets_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["tx_kind"]
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: Database["public"]["Enums"]["tx_kind"]
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["tx_kind"]
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      recurring_rules: {
+        Row: {
+          amount: number
+          category_id: string | null
+          created_at: string
+          end_on: string | null
+          frequency: Database["public"]["Enums"]["recur_freq"]
+          id: string
+          kind: Database["public"]["Enums"]["tx_kind"]
+          next_run_on: string
+          note: string | null
+          start_on: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category_id?: string | null
+          created_at?: string
+          end_on?: string | null
+          frequency: Database["public"]["Enums"]["recur_freq"]
+          id?: string
+          kind: Database["public"]["Enums"]["tx_kind"]
+          next_run_on: string
+          note?: string | null
+          start_on: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string | null
+          created_at?: string
+          end_on?: string | null
+          frequency?: Database["public"]["Enums"]["recur_freq"]
+          id?: string
+          kind?: Database["public"]["Enums"]["tx_kind"]
+          next_run_on?: string
+          note?: string | null
+          start_on?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_rules_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          category_id: string | null
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["tx_kind"]
+          note: string | null
+          occurred_on: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          kind: Database["public"]["Enums"]["tx_kind"]
+          note?: string | null
+          occurred_on?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["tx_kind"]
+          note?: string | null
+          occurred_on?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vault_items: {
+        Row: {
+          ciphertext: string
+          created_at: string
+          id: string
+          item_type: string
+          iv: string
+          label: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ciphertext: string
+          created_at?: string
+          id?: string
+          item_type?: string
+          iv: string
+          label: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ciphertext?: string
+          created_at?: string
+          id?: string
+          item_type?: string
+          iv?: string
+          label?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vault_meta: {
+        Row: {
+          created_at: string
+          salt: string
+          user_id: string
+          verifier_ciphertext: string
+          verifier_iv: string
+        }
+        Insert: {
+          created_at?: string
+          salt: string
+          user_id: string
+          verifier_ciphertext: string
+          verifier_iv: string
+        }
+        Update: {
+          created_at?: string
+          salt?: string
+          user_id?: string
+          verifier_ciphertext?: string
+          verifier_iv?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +244,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      recur_freq: "daily" | "weekly" | "monthly" | "yearly"
+      tx_kind: "income" | "expense"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +372,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      recur_freq: ["daily", "weekly", "monthly", "yearly"],
+      tx_kind: ["income", "expense"],
+    },
   },
 } as const

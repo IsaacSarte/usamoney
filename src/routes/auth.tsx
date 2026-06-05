@@ -62,10 +62,10 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <Wallet className="h-6 w-6 text-primary" />
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-[var(--shadow-soft)]">
+            <Wallet className="h-6 w-6" />
           </div>
-          <CardTitle>Piso Tracker</CardTitle>
+          <CardTitle className="text-2xl">Welcome back</CardTitle>
           <CardDescription>Personal budget &amp; secure data vault</CardDescription>
         </CardHeader>
         <CardContent>
@@ -90,7 +90,7 @@ function AuthPage() {
                   <Label htmlFor="password">Password</Label>
                   <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
-                <Button type="submit" className="w-full" disabled={busy}>
+                <Button type="submit" className="w-full rounded-full" disabled={busy}>
                   {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
                 </Button>
               </form>

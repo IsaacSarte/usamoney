@@ -10,7 +10,7 @@ import { Wallet } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — Piso Tracker" }] }),
+  head: () => ({ meta: [{ title: "Sign in — Usamoney" }] }),
   component: AuthPage,
 });
 

@@ -1,6 +1,6 @@
 {
-  "name": "Budget Tracker",
-  "short_name": "Budget",
+  "name": "Usamoney",
+  "short_name": "Usamoney",
   "description": "Track income, expenses, and secure your financial data",
   "start_url": "/",
   "scope": "/",

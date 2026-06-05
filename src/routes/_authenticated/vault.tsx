@@ -32,7 +32,7 @@ import { Lock, ShieldAlert, Eye, EyeOff, Trash2, Plus, LockKeyhole } from "lucid
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/vault")({
-  head: () => ({ meta: [{ title: "Vault — Piso Tracker" }] }),
+  head: () => ({ meta: [{ title: "Vault — Usamoney" }] }),
   component: VaultPage,
 });
 

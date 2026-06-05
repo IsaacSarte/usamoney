@@ -7,9 +7,9 @@ import { Wallet } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Piso Tracker — Personal Budget" },
+      { title: "Usamoney — Personal Budget" },
       { name: "description", content: "Track income, expenses, budgets, and a secure vault for your important info." },
-      { property: "og:title", content: "Piso Tracker" },
+      { property: "og:title", content: "Usamoney" },
       { property: "og:description", content: "Personal budget tracker with an encrypted data vault." },
     ],
   }),

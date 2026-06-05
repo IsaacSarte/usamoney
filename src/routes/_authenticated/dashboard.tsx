@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -6,11 +6,9 @@ import { listTransactions } from "@/lib/transactions.functions";
 import { listCategories } from "@/lib/categories.functions";
 import { listBudgets } from "@/lib/budgets.functions";
 import { materializeDue } from "@/lib/recurring.functions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { peso, monthKey } from "@/lib/format";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
-import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
+import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Piso Tracker" }] }),
@@ -41,18 +39,8 @@ function Dashboard() {
   const monthTxs = transactions.filter((t) => monthKey(t.occurred_on) === thisMonth);
   const income = monthTxs.filter((t) => t.kind === "income").reduce((s, t) => s + t.amount, 0);
   const expense = monthTxs.filter((t) => t.kind === "expense").reduce((s, t) => s + t.amount, 0);
-
-  // last 6 months
-  const months: string[] = [];
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(monthKey(d));
-  }
-  const monthly = months.map((m) => {
-    const inc = transactions.filter((t) => t.kind === "income" && monthKey(t.occurred_on) === m).reduce((s, t) => s + t.amount, 0);
-    const exp = transactions.filter((t) => t.kind === "expense" && monthKey(t.occurred_on) === m).reduce((s, t) => s + t.amount, 0);
-    return { month: m.slice(5), income: inc, expense: exp };
-  });
+  const balance = income - expense;
+  const monthlyLimit = (budgets.data ?? []).reduce((s, b) => s + b.monthly_limit, 0);
 
   // expense breakdown this month
   const expByCat = new Map<string, number>();
@@ -61,8 +49,10 @@ function Dashboard() {
     expByCat.set(name, (expByCat.get(name) ?? 0) + t.amount);
   });
   const pieData = Array.from(expByCat.entries()).map(([name, value]) => ({ name, value }));
-  // Candy palette matching the reference shot: mint, purple, pink, peach, coral, lilac.
-  const pieColors = ["#7ad3c5", "#7c5cff", "#f48fb1", "#ffb38a", "#ff7a7a", "#b39ddb", "#80deea", "#ffd180"];
+  const pieTotal = pieData.reduce((s, p) => s + p.value, 0);
+  const topCatPct = pieTotal > 0 ? Math.round((Math.max(...pieData.map((p) => p.value)) / pieTotal) * 100) : 0;
+  // Candy palette matching the reference shot: mint, purple, pink, gray, navy.
+  const pieColors = ["#5ec6b8", "#7c5cff", "#f48fb1", "#c8c8d6", "#2e3a8a", "#ffb38a", "#ff7a7a", "#b39ddb"];
 
   // budget progress
   const budgetRows = (budgets.data ?? []).map((b) => {
@@ -72,122 +62,187 @@ function Dashboard() {
   });
 
   const recent = transactions.slice(0, 8);
+  const pieLegend = pieData.slice(0, 5);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Balance</h1>
-        <p className="text-4xl font-semibold text-primary mt-1">{peso(income - expense)}</p>
-        <p className="text-sm text-muted-foreground mt-1">Net for {thisMonth}</p>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard icon={<TrendingUp className="h-5 w-5 text-[color:var(--income)]" />} label="Income this month" value={peso(income)} />
-        <StatCard icon={<TrendingDown className="h-5 w-5 text-[color:var(--expense)]" />} label="Expenses this month" value={peso(expense)} />
-        <StatCard icon={<Wallet className="h-5 w-5 text-primary" />} label="Net" value={peso(income - expense)} />
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader><CardTitle>Last 6 months</CardTitle></CardHeader>
-          <CardContent style={{ height: 260 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthly}>
-                <XAxis dataKey="month" fontSize={12} stroke="#9aa0bf" />
-                <YAxis fontSize={12} stroke="#9aa0bf" />
-                <Tooltip formatter={(v: number) => peso(v)} />
-                <Legend />
-                <Bar dataKey="income" fill="#7ad3c5" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="expense" fill="#7c5cff" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader><CardTitle>Expense breakdown</CardTitle></CardHeader>
-          <CardContent style={{ height: 260 }}>
-            {pieData.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No expenses this month yet.</p>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={55}
-                    outerRadius={95}
-                    paddingAngle={3}
-                    stroke="none"
-                  >
-                    {pieData.map((_, i) => <Cell key={i} fill={pieColors[i % pieColors.length]} />)}
-                  </Pie>
-                  <Tooltip formatter={(v: number) => peso(v)} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {budgetRows.length > 0 && (
-        <Card>
-          <CardHeader><CardTitle>Budgets</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            {budgetRows.map((b) => {
-              const pct = b.limit > 0 ? Math.min(100, (b.spent / b.limit) * 100) : 0;
-              return (
-                <div key={b.id}>
-                  <div className="mb-1 flex justify-between text-sm">
-                    <span>{b.name}</span>
-                    <span className={b.spent > b.limit ? "text-destructive" : "text-muted-foreground"}>
-                      {peso(b.spent)} / {peso(b.limit)}
-                    </span>
-                  </div>
-                  <Progress value={pct} />
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardHeader><CardTitle>Recent transactions</CardTitle></CardHeader>
-        <CardContent>
+    <>
+      {/* ===== MOBILE LAYOUT (matches screenshot 2) ===== */}
+      <div className="md:hidden -mx-4 -mt-2">
+        <section className="bg-[color:var(--primary-soft)] px-6 pt-6 pb-10 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Balance</h1>
+          <p className="mt-4 flex items-baseline justify-center gap-2 text-primary">
+            <span className="text-4xl font-light">₱</span>
+            <span className="text-5xl font-semibold tracking-tight">
+              {new Intl.NumberFormat("en-PH", { maximumFractionDigits: 2 }).format(balance)}
+            </span>
+          </p>
+          <div className="mt-8 grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <div className="text-muted-foreground">Monthly Limit Goal</div>
+              <div className="mt-1 text-primary">{peso(monthlyLimit)}</div>
+            </div>
+            <div>
+              <div className="text-muted-foreground">Monthly Income</div>
+              <div className="mt-1 text-primary">{peso(income)}</div>
+            </div>
+          </div>
+        </section>
+        <section className="-mt-6 rounded-t-[2rem] bg-white px-6 pt-8 pb-10 shadow-[var(--shadow-soft)]">
+          <h2 className="text-center text-xl font-semibold text-primary">Last Transactions</h2>
+          <div className="mx-auto mt-2 h-0.5 w-28 bg-primary/40" />
           {recent.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No transactions yet. Add one from the Transactions tab.</p>
+            <p className="mt-6 text-center text-sm text-muted-foreground">No transactions yet.</p>
           ) : (
-            <ul className="divide-y">
+            <ul className="mt-6 space-y-4 text-sm">
               {recent.map((t) => (
-                <li key={t.id} className="flex items-center justify-between py-2 text-sm">
-                  <div>
-                    <div className="font-medium">{(t.category_id && catMap.get(t.category_id)?.name) || "Uncategorized"}</div>
-                    <div className="text-xs text-muted-foreground">{t.occurred_on} {t.note ? `· ${t.note}` : ""}</div>
-                  </div>
-                  <span className={t.kind === "income" ? "text-[color:var(--income)] font-medium" : "text-[color:var(--expense)] font-medium"}>
+                <li key={t.id} className="flex items-center justify-between">
+                  <span className="text-foreground/80">
+                    {(t.category_id && catMap.get(t.category_id)?.name) || t.note || "Uncategorized"}
+                  </span>
+                  <span className={t.kind === "income" ? "text-[color:var(--income)]" : "text-primary"}>
                     {t.kind === "income" ? "+" : "-"}{peso(t.amount)}
                   </span>
                 </li>
               ))}
             </ul>
           )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+        </section>
+      </div>
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <Card>
-      <CardContent className="flex items-center gap-3 pt-6">
-        <div className="rounded-full bg-muted p-3">{icon}</div>
-        <div>
-          <div className="text-xs text-muted-foreground">{label}</div>
-          <div className="text-2xl font-semibold">{value}</div>
+      {/* ===== DESKTOP / TABLET LAYOUT (matches screenshot 1) ===== */}
+      <div className="hidden md:grid md:grid-cols-3 md:gap-6">
+        {/* Main white card */}
+        <div className="md:col-span-2 rounded-[2rem] bg-white p-8 shadow-[var(--shadow-soft)]">
+          <h1 className="text-3xl font-semibold tracking-tight">Balance</h1>
+          <p className="mt-4 flex items-baseline gap-2 text-primary">
+            <span className="text-4xl font-light">₱</span>
+            <span className="text-5xl font-semibold tracking-tight">
+              {new Intl.NumberFormat("en-PH", { maximumFractionDigits: 2 }).format(balance)}
+            </span>
+          </p>
+          <div className="mt-6 flex gap-12 text-sm">
+            <div>
+              <div className="text-muted-foreground">Monthly Limit Goal</div>
+              <div className="mt-1 text-primary">{peso(monthlyLimit)}</div>
+            </div>
+            <div>
+              <div className="text-muted-foreground">Monthly Income</div>
+              <div className="mt-1 text-primary">{peso(income)}</div>
+            </div>
+          </div>
+
+          <hr className="my-8 border-primary/20" />
+
+          {/* Breakdown */}
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="space-y-3 self-center">
+              {pieLegend.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No expenses this month yet.</p>
+              ) : (
+                pieLegend.map((p, i) => (
+                  <div key={p.name} className="flex items-center justify-end gap-3 text-sm">
+                    <span className="text-foreground/80">{p.name}</span>
+                    <span className="inline-block h-3 w-3 rounded-full" style={{ background: pieColors[i % pieColors.length] }} />
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="relative h-[260px]">
+              {pieData.length > 0 && (
+                <>
+                  <div className="absolute left-2 top-2 text-sm text-primary">
+                    {peso(Math.max(...pieData.map((p) => p.value)))}
+                  </div>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={70}
+                        outerRadius={110}
+                        paddingAngle={2}
+                        stroke="none"
+                      >
+                        {pieData.map((_, i) => (
+                          <Cell key={i} fill={pieColors[i % pieColors.length]} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                    <span className="text-xl font-semibold text-foreground/80">{topCatPct}%</span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Right purple sidebar */}
+        <aside className="rounded-[2rem] bg-[color:var(--primary-soft)] p-6 shadow-[var(--shadow-soft)]">
+          <h2 className="text-center text-lg font-semibold text-primary">Last Transactions</h2>
+          <div className="mx-auto mt-2 h-0.5 w-32 bg-primary/40" />
+          {recent.length === 0 ? (
+            <p className="mt-6 text-center text-sm text-muted-foreground">No transactions yet.</p>
+          ) : (
+            <ul className="mt-5 space-y-3 text-sm">
+              {recent.map((t) => (
+                <li key={t.id} className="flex items-center justify-between">
+                  <span className="text-foreground/80">
+                    {(t.category_id && catMap.get(t.category_id)?.name) || t.note || "Uncategorized"}
+                  </span>
+                  <span className={t.kind === "income" ? "text-[color:var(--income)]" : "text-primary"}>
+                    {t.kind === "income" ? "+" : "-"}{peso(t.amount)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {budgetRows.length > 0 && (
+            <div className="mt-8 space-y-3">
+              <h3 className="text-sm font-semibold text-primary">Budgets</h3>
+              {budgetRows.slice(0, 4).map((b) => {
+                const pct = b.limit > 0 ? Math.min(100, (b.spent / b.limit) * 100) : 0;
+                return (
+                  <div key={b.id}>
+                    <div className="mb-1 flex justify-between text-xs">
+                      <span className="text-foreground/80">{b.name}</span>
+                      <span className={b.spent > b.limit ? "text-destructive" : "text-muted-foreground"}>
+                        {peso(b.spent)} / {peso(b.limit)}
+                      </span>
+                    </div>
+                    <Progress value={pct} />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </aside>
+
+        {/* Quick links row */}
+        <div className="md:col-span-3 mt-2 grid gap-4 sm:grid-cols-3">
+          <Link
+            to="/transactions"
+            className="rounded-2xl bg-primary px-6 py-4 text-center font-medium text-primary-foreground shadow-[var(--shadow-soft)] transition hover:opacity-90"
+          >
+            + Add Transaction
+          </Link>
+          <Link
+            to="/budgets"
+            className="rounded-2xl bg-white px-6 py-4 text-center font-medium text-primary shadow-[var(--shadow-soft)] transition hover:bg-primary/5"
+          >
+            Manage Budgets
+          </Link>
+          <Link
+            to="/categories"
+            className="rounded-2xl bg-white px-6 py-4 text-center font-medium text-primary shadow-[var(--shadow-soft)] transition hover:bg-primary/5"
+          >
+            Categories
+          </Link>
+        </div>
+      </div>
+    </>
   );
 }

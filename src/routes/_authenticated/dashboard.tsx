@@ -61,7 +61,8 @@ function Dashboard() {
     expByCat.set(name, (expByCat.get(name) ?? 0) + t.amount);
   });
   const pieData = Array.from(expByCat.entries()).map(([name, value]) => ({ name, value }));
-  const pieColors = ["#10b981", "#f97316", "#3b82f6", "#a855f7", "#eab308", "#ef4444", "#06b6d4", "#84cc16"];
+  // Candy palette matching the reference shot: mint, purple, pink, peach, coral, lilac.
+  const pieColors = ["#7ad3c5", "#7c5cff", "#f48fb1", "#ffb38a", "#ff7a7a", "#b39ddb", "#80deea", "#ffd180"];
 
   // budget progress
   const budgetRows = (budgets.data ?? []).map((b) => {
@@ -74,6 +75,11 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-semibold tracking-tight">Balance</h1>
+        <p className="text-4xl font-semibold text-primary mt-1">{peso(income - expense)}</p>
+        <p className="text-sm text-muted-foreground mt-1">Net for {thisMonth}</p>
+      </div>
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard icon={<TrendingUp className="h-5 w-5 text-[color:var(--income)]" />} label="Income this month" value={peso(income)} />
         <StatCard icon={<TrendingDown className="h-5 w-5 text-[color:var(--expense)]" />} label="Expenses this month" value={peso(expense)} />
@@ -86,12 +92,12 @@ function Dashboard() {
           <CardContent style={{ height: 260 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthly}>
-                <XAxis dataKey="month" fontSize={12} />
-                <YAxis fontSize={12} />
+                <XAxis dataKey="month" fontSize={12} stroke="#9aa0bf" />
+                <YAxis fontSize={12} stroke="#9aa0bf" />
                 <Tooltip formatter={(v: number) => peso(v)} />
                 <Legend />
-                <Bar dataKey="income" fill="#10b981" />
-                <Bar dataKey="expense" fill="#ef4444" />
+                <Bar dataKey="income" fill="#7ad3c5" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="expense" fill="#7c5cff" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -104,10 +110,19 @@ function Dashboard() {
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={90} label>
+                  <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={55}
+                    outerRadius={95}
+                    paddingAngle={3}
+                    stroke="none"
+                  >
                     {pieData.map((_, i) => <Cell key={i} fill={pieColors[i % pieColors.length]} />)}
                   </Pie>
                   <Tooltip formatter={(v: number) => peso(v)} />
+                  <Legend />
                 </PieChart>
               </ResponsiveContainer>
             )}

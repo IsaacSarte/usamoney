@@ -11,7 +11,7 @@ import { peso, monthKey } from "@/lib/format";
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — Piso Tracker" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Usamoney" }] }),
   component: Dashboard,
 });
 

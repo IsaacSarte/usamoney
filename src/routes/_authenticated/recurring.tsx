@@ -26,7 +26,7 @@ import { toast } from "sonner";
 import { peso, todayISO } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/recurring")({
-  head: () => ({ meta: [{ title: "Recurring — Piso Tracker" }] }),
+  head: () => ({ meta: [{ title: "Recurring — Usamoney" }] }),
   component: RecurringPage,
 });
 

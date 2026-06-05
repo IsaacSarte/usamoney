@@ -50,7 +50,7 @@ export function AppShell() {
             <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-[var(--shadow-soft)]">
               <Wallet className="h-4 w-4" />
             </span>
-            <span className="text-lg text-primary">Piso Tracker</span>
+            <span className="text-lg text-primary">Usamoney</span>
           </Link>
           <Button variant="ghost" size="sm" onClick={signOut} className="rounded-full">
             <LogOut className="mr-2 h-4 w-4" /> Sign out

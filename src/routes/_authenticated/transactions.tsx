@@ -15,7 +15,7 @@ import { Trash2, Download, Clock, Send } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/transactions")({
-  head: () => ({ meta: [{ title: "Transactions — Piso Tracker" }] }),
+  head: () => ({ meta: [{ title: "Transactions — Usamoney" }] }),
   component: TransactionsPage,
 });
 

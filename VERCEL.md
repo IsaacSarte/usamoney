@@ -1,8 +1,10 @@
 # Deploying to Vercel
 
-This app is configured to build for Vercel via Nitro's `vercel` preset
-(see `vite.config.ts` → `nitro: { preset: "vercel" }`). The build emits
-`.vercel/output/` (Vercel Build Output API v3), which Vercel auto-detects.
+This app builds for Vercel via Nitro's `vercel` preset, switched on by the
+`NITRO_PRESET=vercel` environment variable (see `vite.config.ts`). The build
+emits `.vercel/output/` (Vercel Build Output API v3), which Vercel
+auto-detects. Lovable Cloud builds keep using the Cloudflare preset because
+`NITRO_PRESET` is not set there.
 
 ## One-time setup
 
@@ -14,10 +16,13 @@ This app is configured to build for Vercel via Nitro's `vercel` preset
 
 ## Required environment variables
 
-Set these in **Project Settings → Environment Variables** (Production + Preview):
+Set these in **Project Settings → Environment Variables** (Production + Preview).
+`NITRO_PRESET` is what flips the build to Vercel — without it you'd get the
+Cloudflare Worker bundle.
 
 | Name | Value |
 | --- | --- |
+| `NITRO_PRESET` | `vercel` |
 | `SUPABASE_URL` | `https://qvdzgweruxrdgxbvtubj.supabase.co` |
 | `SUPABASE_PUBLISHABLE_KEY` | (same anon key as `VITE_SUPABASE_PUBLISHABLE_KEY`) |
 | `SUPABASE_SERVICE_ROLE_KEY` | service role key from the backend dashboard |

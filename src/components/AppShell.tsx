@@ -13,6 +13,8 @@ import {
   Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MonthProvider } from "@/lib/month-context";
+import { MonthSwitcher } from "@/components/MonthSwitcher";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -42,6 +44,7 @@ export function AppShell() {
     router.navigate({ to: "/auth", replace: true });
   };
   return (
+    <MonthProvider>
     <div className="min-h-screen bg-background text-foreground">
       {/* Top header: full bar on md+, compact bar on mobile */}
       <header className="sticky top-0 z-20 bg-background/80 backdrop-blur">
@@ -52,9 +55,12 @@ export function AppShell() {
             </span>
             <span className="text-lg text-primary">Usamoney</span>
           </Link>
-          <Button variant="ghost" size="sm" onClick={signOut} className="rounded-full">
-            <LogOut className="mr-2 h-4 w-4" /> Sign out
-          </Button>
+          <div className="flex items-center gap-2">
+            <MonthSwitcher />
+            <Button variant="ghost" size="sm" onClick={signOut} className="rounded-full">
+              <LogOut className="mr-2 h-4 w-4" /> <span className="hidden sm:inline">Sign out</span>
+            </Button>
+          </div>
         </div>
         {/* Desktop/tablet horizontal nav */}
         <nav className="mx-auto hidden max-w-6xl gap-1 overflow-x-auto px-4 pb-3 md:flex">
@@ -98,6 +104,7 @@ export function AppShell() {
         </div>
       </nav>
     </div>
+    </MonthProvider>
   );
 }
 

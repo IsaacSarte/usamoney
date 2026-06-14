@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { peso, todayISO } from "@/lib/format";
 import { Trash2, Download, Clock, Send } from "lucide-react";
 import { toast } from "sonner";
+import { useMonth, monthRange } from "@/lib/month-context";
 
 export const Route = createFileRoute("/_authenticated/transactions")({
   head: () => ({ meta: [{ title: "Transactions — Usamoney" }] }),
@@ -40,6 +41,7 @@ function saveQueue(q: QueuedTx[]) {
 
 function TransactionsPage() {
   const qc = useQueryClient();
+  const { month: selectedMonth, label: monthLabel, isCurrent } = useMonth();
   const txs = useQuery({ queryKey: ["transactions"], queryFn: () => listTransactions() });
   const cats = useQuery({ queryKey: ["categories"], queryFn: () => listCategories() });
   const create = useServerFn(createTransaction);
@@ -126,7 +128,11 @@ function TransactionsPage() {
 
   const categories = cats.data ?? [];
   const visibleCats = categories.filter((c) => c.kind === kind);
-  const transactions = txs.data ?? [];
+  const allTransactions = txs.data ?? [];
+  const { start: monthStart, end: monthEnd } = monthRange(selectedMonth);
+  const transactions = allTransactions.filter(
+    (t) => t.occurred_on >= monthStart && t.occurred_on <= monthEnd,
+  );
   const catMap = new Map(categories.map((c) => [c.id, c]));
 
   const exportCsv = () => {
@@ -239,12 +245,17 @@ function TransactionsPage() {
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>All transactions</CardTitle>
+          <CardTitle>
+            Transactions
+            <span className="ml-2 text-sm font-normal text-muted-foreground">
+              {monthLabel}{isCurrent ? "" : " · past month"}
+            </span>
+          </CardTitle>
           <Button variant="outline" size="sm" onClick={exportCsv}><Download className="mr-2 h-4 w-4" />CSV</Button>
         </CardHeader>
         <CardContent>
           {transactions.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Nothing yet.</p>
+            <p className="text-sm text-muted-foreground">No transactions in {monthLabel}.</p>
           ) : (
             <ul className="divide-y">
               {transactions.map((t) => (

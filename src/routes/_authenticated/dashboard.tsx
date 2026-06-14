@@ -9,6 +9,7 @@ import { materializeDue } from "@/lib/recurring.functions";
 import { Progress } from "@/components/ui/progress";
 import { peso, monthKey } from "@/lib/format";
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { useMonth } from "@/lib/month-context";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Usamoney" }] }),
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function Dashboard() {
   const qc = useQueryClient();
   const materialize = useServerFn(materializeDue);
+  const { month: selectedMonth, label: monthLabel, isCurrent } = useMonth();
   const txs = useQuery({ queryKey: ["transactions"], queryFn: () => listTransactions() });
   const cats = useQuery({ queryKey: ["categories"], queryFn: () => listCategories() });
   const budgets = useQuery({ queryKey: ["budgets"], queryFn: () => listBudgets() });
@@ -33,10 +35,7 @@ function Dashboard() {
   const transactions = txs.data ?? [];
   const categories = cats.data ?? [];
   const catMap = new Map(categories.map((c) => [c.id, c]));
-  const now = new Date();
-  const thisMonth = monthKey(now);
-
-  const monthTxs = transactions.filter((t) => monthKey(t.occurred_on) === thisMonth);
+  const monthTxs = transactions.filter((t) => monthKey(t.occurred_on) === selectedMonth);
   const income = monthTxs.filter((t) => t.kind === "income").reduce((s, t) => s + t.amount, 0);
   const expense = monthTxs.filter((t) => t.kind === "expense").reduce((s, t) => s + t.amount, 0);
   const balance = income - expense;
@@ -70,6 +69,9 @@ function Dashboard() {
       <div className="md:hidden -mx-4 -mt-2">
         <section className="bg-[color:var(--primary-soft)] px-6 pt-6 pb-10 text-center">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">Balance</h1>
+          <p className="mt-1 text-xs uppercase tracking-wide text-primary/70">
+            {monthLabel}{isCurrent ? "" : " (past)"}
+          </p>
           <p className="mt-4 flex items-baseline justify-center gap-2 text-primary">
             <span className="text-4xl font-light">₱</span>
             <span className="text-5xl font-semibold tracking-tight">
@@ -113,7 +115,10 @@ function Dashboard() {
       <div className="hidden md:grid md:grid-cols-3 md:gap-6">
         {/* Main white card */}
         <div className="md:col-span-2 rounded-[2rem] bg-white p-8 shadow-[var(--shadow-soft)]">
-          <h1 className="text-3xl font-semibold tracking-tight">Balance</h1>
+          <div className="flex items-baseline justify-between">
+            <h1 className="text-3xl font-semibold tracking-tight">Balance</h1>
+            <span className="text-sm text-muted-foreground">{monthLabel}{isCurrent ? "" : " · past"}</span>
+          </div>
           <p className="mt-4 flex items-baseline gap-2 text-primary">
             <span className="text-4xl font-light">₱</span>
             <span className="text-5xl font-semibold tracking-tight">

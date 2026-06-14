@@ -9,7 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { peso } from "@/lib/format";
+import { peso, monthKey } from "@/lib/format";
+import { Progress } from "@/components/ui/progress";
+import { listTransactions } from "@/lib/transactions.functions";
+import { useMonth } from "@/lib/month-context";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,8 +23,10 @@ export const Route = createFileRoute("/_authenticated/budgets")({
 
 function BudgetsPage() {
   const qc = useQueryClient();
+  const { month: selectedMonth, label: monthLabel } = useMonth();
   const cats = useQuery({ queryKey: ["categories"], queryFn: () => listCategories() });
   const budgets = useQuery({ queryKey: ["budgets"], queryFn: () => listBudgets() });
+  const txs = useQuery({ queryKey: ["transactions"], queryFn: () => listTransactions() });
   const upsert = useServerFn(upsertBudget);
   const del = useServerFn(deleteBudget);
   const [categoryId, setCategoryId] = useState("");
@@ -39,6 +44,7 @@ function BudgetsPage() {
 
   const expenseCats = (cats.data ?? []).filter((c) => c.kind === "expense");
   const catMap = new Map((cats.data ?? []).map((c) => [c.id, c]));
+  const monthTxs = (txs.data ?? []).filter((t) => monthKey(t.occurred_on) === selectedMonth);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
@@ -64,21 +70,40 @@ function BudgetsPage() {
         </CardContent>
       </Card>
       <Card>
-        <CardHeader><CardTitle>Active budgets</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>
+            Active budgets
+            <span className="ml-2 text-sm font-normal text-muted-foreground">{monthLabel}</span>
+          </CardTitle>
+        </CardHeader>
         <CardContent>
           {(budgets.data ?? []).length === 0 ? (
             <p className="text-sm text-muted-foreground">No budgets yet.</p>
           ) : (
             <ul className="divide-y">
-              {(budgets.data ?? []).map((b) => (
-                <li key={b.id} className="flex items-center justify-between py-2 text-sm">
-                  <div>
-                    <div className="font-medium">{catMap.get(b.category_id)?.name ?? "—"}</div>
-                    <div className="text-xs text-muted-foreground">{peso(b.monthly_limit)} / month</div>
-                  </div>
-                  <Button size="icon" variant="ghost" onClick={() => delMut.mutate(b.id)}><Trash2 className="h-4 w-4" /></Button>
-                </li>
-              ))}
+              {(budgets.data ?? []).map((b) => {
+                const spent = monthTxs
+                  .filter((t) => t.kind === "expense" && t.category_id === b.category_id)
+                  .reduce((s, t) => s + t.amount, 0);
+                const pct = b.monthly_limit > 0 ? Math.min(100, (spent / b.monthly_limit) * 100) : 0;
+                const over = spent > b.monthly_limit;
+                return (
+                  <li key={b.id} className="py-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{catMap.get(b.category_id)?.name ?? "—"}</div>
+                        <div className={`text-xs ${over ? "text-destructive" : "text-muted-foreground"}`}>
+                          {peso(spent)} / {peso(b.monthly_limit)}
+                        </div>
+                      </div>
+                      <Button size="icon" variant="ghost" onClick={() => delMut.mutate(b.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <Progress value={pct} className="mt-2" />
+                  </li>
+                );
+              })}
             </ul>
           )}
         </CardContent>

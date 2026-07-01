@@ -11,6 +11,7 @@ import {
   Lock,
   LogOut,
   Plus,
+  History,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MonthProvider } from "@/lib/month-context";
@@ -23,6 +24,7 @@ const navItems = [
   { to: "/budgets", label: "Budgets", icon: Target },
   { to: "/recurring", label: "Recurring", icon: RefreshCcw },
   { to: "/vault", label: "Vault", icon: Lock },
+  { to: "/history", label: "History", icon: History },
 ] as const;
 
 // Mobile bottom nav: 5 slots with a centered "+" FAB linking to add transaction.

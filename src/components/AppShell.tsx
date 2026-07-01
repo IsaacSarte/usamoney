@@ -66,8 +66,8 @@ export function AppShell() {
             </Button>
           </div>
         </div>
-        {/* Desktop/tablet horizontal nav */}
-        <nav className="mx-auto hidden max-w-6xl gap-1 overflow-x-auto px-4 pb-3 md:flex">
+        {/* Horizontal nav — scrollable on mobile so all items (incl. Totals/History) are reachable */}
+        <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 pb-3">
           {navItems.map((item) => (
             <Link
               key={item.to}

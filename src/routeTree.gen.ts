@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedVaultRouteImport } from './routes/_authenticated/vault'
 import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
 import { Route as AuthenticatedRecurringRouteImport } from './routes/_authenticated/recurring'
+import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
 import { Route as AuthenticatedBudgetsRouteImport } from './routes/_authenticated/budgets'
@@ -49,6 +50,11 @@ const AuthenticatedRecurringRoute = AuthenticatedRecurringRouteImport.update({
   path: '/recurring',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/budgets': typeof AuthenticatedBudgetsRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/history': typeof AuthenticatedHistoryRoute
   '/recurring': typeof AuthenticatedRecurringRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/vault': typeof AuthenticatedVaultRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/budgets': typeof AuthenticatedBudgetsRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/history': typeof AuthenticatedHistoryRoute
   '/recurring': typeof AuthenticatedRecurringRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/vault': typeof AuthenticatedVaultRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/_authenticated/budgets': typeof AuthenticatedBudgetsRoute
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/recurring': typeof AuthenticatedRecurringRoute
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
   '/_authenticated/vault': typeof AuthenticatedVaultRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/budgets'
     | '/categories'
     | '/dashboard'
+    | '/history'
     | '/recurring'
     | '/transactions'
     | '/vault'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/budgets'
     | '/categories'
     | '/dashboard'
+    | '/history'
     | '/recurring'
     | '/transactions'
     | '/vault'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '/_authenticated/budgets'
     | '/_authenticated/categories'
     | '/_authenticated/dashboard'
+    | '/_authenticated/history'
     | '/_authenticated/recurring'
     | '/_authenticated/transactions'
     | '/_authenticated/vault'
@@ -181,6 +193,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRecurringRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/history': {
+      id: '/_authenticated/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -209,6 +228,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBudgetsRoute: typeof AuthenticatedBudgetsRoute
   AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedRecurringRoute: typeof AuthenticatedRecurringRoute
   AuthenticatedTransactionsRoute: typeof AuthenticatedTransactionsRoute
   AuthenticatedVaultRoute: typeof AuthenticatedVaultRoute
@@ -218,6 +238,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBudgetsRoute: AuthenticatedBudgetsRoute,
   AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedRecurringRoute: AuthenticatedRecurringRoute,
   AuthenticatedTransactionsRoute: AuthenticatedTransactionsRoute,
   AuthenticatedVaultRoute: AuthenticatedVaultRoute,
